@@ -17,22 +17,10 @@ const MenuProps = {
   },
 };
 
-const MultipleSelect = ({ label, source, value, handleChange })  => {
-//   const [personName, setPersonName] = useState([]);
-
-//   const handleChange = (event) => {
-//     const {
-//       target: { value },
-//     } = event;
-//     setPersonName(
-//       // On autofill we get a stringified value.
-//       typeof value === 'string' ? value.split(',') : value,
-//     );
-//   };
-
+const MultipleSelect = ({ label, source, value, handleChange, error })  => {
   return (
     <div>
-      <FormControl variant="standard" sx={{ width: 300 }}>
+      <FormControl variant="standard" sx={{ width: 300 }} error={error}>
         <InputLabel id="multiple-checkbox-label">{label}</InputLabel>
         <Select
             className='form-field-center'
