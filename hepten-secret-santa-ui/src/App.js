@@ -1,7 +1,7 @@
 
 import './App.css';
 import Header from './components/shared/Header';
-import Home from './components/Home/Home';
+import Home from './pages/Home/Home';
 
 import { ThemeProvider } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
@@ -24,6 +24,11 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: 'Amatic SC',
+    // fontSize: '2rem',
+    // fontSize: 16,
+    body1: {
+        fontSize: 24,
+      },
     button: {
       fontSize: '2rem',
       margin: 5,
