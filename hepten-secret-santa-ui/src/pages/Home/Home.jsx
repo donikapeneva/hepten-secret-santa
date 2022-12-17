@@ -3,15 +3,18 @@ import './Home.css';
 import Button from '@mui/material/Button';
 import { Typography } from '@mui/material';
 import CreateRoomModal from '../../components/CreateRoomModal';
+import EnterRoomModal from '../../components/EnterRoomModal';
 
 const Header = () => {
 
-    const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        console.log('>>> on close');
-        setOpen(false);
-    }
+    const [openCreateRoom, setOpenCreateRoom] = useState(false);
+    const handleOpenCreateRoom = () => setOpenCreateRoom(true);
+    const handleCloseCreateRoom = () => setOpenCreateRoom(false);
+
+    
+    const [openEnterRoom, setOpenEnterRoom] = useState(false);
+    const handleOpenEnterRoom = () => setOpenEnterRoom(true);
+    const handleCloseEnterRoom = () => setOpenEnterRoom(false);
 
   return (
     <div className="container">
@@ -20,14 +23,16 @@ const Header = () => {
         Hepten Secret Santa
       </Typography>
       </div>
-      <Button variant="outlined" onClick={handleOpen}>             
+      <Button variant="outlined" onClick={handleOpenCreateRoom}> 
         Create room
       </Button>
-      <CreateRoomModal open={open} onClose={handleClose}/>
+      <CreateRoomModal open={openCreateRoom} onClose={handleCloseCreateRoom}/>
 
-      <Button variant="outlined"> 
+      <Button variant="outlined" onClick={handleOpenEnterRoom}> 
         Enter room
       </Button>
+      <EnterRoomModal open={openEnterRoom} onClose={handleCloseEnterRoom}/>
+
       <Button>
         How does it work
       </Button>

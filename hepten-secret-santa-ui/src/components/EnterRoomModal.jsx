@@ -6,21 +6,6 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
-import MultipleSelect from './MultipleSelect';
-import FancySelect from './FancySelect';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-
-const mockedCodeNameThemes = [
-    'Famous People',
-    'Friends',
-    'Movies',
-];
-
-const mockedGiftThemes = [
-    'Colors',
-    'Adjectives',
-];
 
 const style = {
   position: 'absolute',
@@ -35,19 +20,13 @@ const style = {
 };
 
 
-const CreateRoomModal = ({ open, onClose }) => {
-    const [codeNamesThemes, setCodeNamesThemes] = useState();
-    const [giftThemes, setGiftThemes] = useState();
+const EnterRoomModal = ({ open, onClose }) => {
 
     const [roomName, setRoomName] = useState();
     const [roomPass, setRoomPass] = useState();
-    const [codeNamesThemeSelected, setCodeNamesThemeSelected] = useState('');
-    const [giftThemesSelected, setGiftThemesSelected] = useState([]);
-    const [budget, setBudget] = useState();
-    const [genderReviel, setGenderReviel] = useState();
-
+    const [username, setUsername] = useState();
+    
     const [validationErrors, setValidationErrors] = useState();
-
 
     const validateForm = () => {
         if(!roomName) {
@@ -56,18 +35,10 @@ const CreateRoomModal = ({ open, onClose }) => {
         if(!roomPass) {
             setValidationErrors(currentErrors => ({...currentErrors, roomPassError: true}));
         }
-        
-        if(!codeNamesThemeSelected) {
-            setValidationErrors(currentErrors => ({...currentErrors, codeNamesThemeError: true}));
+        if(!username) {
+            setValidationErrors(currentErrors => ({...currentErrors, usernameError: true}));
         }
         
-        if(!giftThemesSelected || giftThemesSelected.length === 0) {
-            setValidationErrors(currentErrors => ({...currentErrors, giftThemesError: true}));
-        }
-        
-        if(!budget) {
-            setValidationErrors(currentErrors => ({...currentErrors, budgetError: true}));
-        }
     }
 
     const resetErrors = (field) => {
@@ -93,38 +64,21 @@ const CreateRoomModal = ({ open, onClose }) => {
         resetErrors('roomPassError');
         setRoomPass(e.target.value);
     }
-    const onCodeNamesThemeSelectedChange = (e) => {
-        resetErrors('codeNamesThemeError');
-        setCodeNamesThemeSelected(e.target.value);
-    };
-    const onGiftThemesSelectedChange = (e) => {
-        resetErrors('giftThemesError');
-        const { target: { value } } = e;
-        setGiftThemesSelected(typeof value === 'string' ? value.split(',') : value);
-    };
-    const onBudgetChange = (e) => {
-        resetErrors('budgetError');
-        setBudget(e.target.value);
+    
+    const onUsernameChange = (e) => {
+        resetErrors('usernameError');
+        setUsername(e.target.value);
     }
-    const onGenderRevielChange = (e) => setGenderReviel(e.target.value);
 
-    const handleCreateRoom = () => {
+    const handleEnterRoom = () => {
         validateForm();
-        const newRoomData = {
+        const enterRoomData = {
             roomName: roomName,
             roomPassCode: roomPass,
-            codeNamesTheme: codeNamesThemeSelected,
-            giftTheme: giftThemesSelected,
-            budget: budget,
-            genderReviel: genderReviel
+            username: username
         }
         //todo send to BE
     }
-
-    useEffect(() => {
-        setCodeNamesThemes(mockedCodeNameThemes);
-        setGiftThemes(mockedGiftThemes);
-    }, []);
 
     return (
       <div>
@@ -134,8 +88,6 @@ const CreateRoomModal = ({ open, onClose }) => {
           open={open}
           onClose={() => {
             onClose();
-            setGiftThemesSelected([]);
-            setCodeNamesThemeSelected('');
             resetErrors();
         }}
           closeAfterTransition
@@ -167,39 +119,18 @@ const CreateRoomModal = ({ open, onClose }) => {
                             onChange={onRoomPassChange}
                             error={validationErrors?.roomPassError}
                         />
-
-                        <FancySelect 
-                            label="Code Names Theme"
-                            source={codeNamesThemes}
-                            handleChange={onCodeNamesThemeSelectedChange}
-                            value={codeNamesThemeSelected}
-                            error={validationErrors?.codeNamesThemeError}
-                        />
-                        <MultipleSelect 
-                            label="Code Gift Theme"
-                            source={giftThemes}
-                            handleChange={onGiftThemesSelectedChange}
-                            value={giftThemesSelected}
-                            error={validationErrors?.giftThemesError}
-                        />
-
                         <TextField 
-                            id="standard-basic" 
-                            label="Budget" 
+                            id="standard-basic"
+                            label="Username" 
                             variant="standard" 
-                            onChange={onBudgetChange}
-                            error={validationErrors?.budgetError}
-                        />
-                        <FormControlLabel 
-                            control={<Checkbox defaultChecked />} 
-                            label="I want to know the gender" 
-                            onChange={onGenderRevielChange}
+                            onChange={onUsernameChange}
+                            error={validationErrors?.usernameError}
                         />
 
                         <Button 
                             variant="outlined"
-                            onClick={handleCreateRoom}>
-                                create room
+                            onClick={handleEnterRoom}>
+                                enter room
                             </Button>
                         {/* </FormGroup> */}
                 </Stack>
@@ -210,4 +141,4 @@ const CreateRoomModal = ({ open, onClose }) => {
     );
   }
 
-  export default CreateRoomModal;
+  export default EnterRoomModal;
