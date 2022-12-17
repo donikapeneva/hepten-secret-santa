@@ -13,6 +13,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
+// import ModalClose from '@mui/material/ModalClose';
+
 
 const mockedCodeNameThemes = [
     'Famous People',
@@ -42,10 +44,40 @@ const CreateRoomModal = ({ open, onClose }) => {
     const [codeNamesThemes, setCodeNamesThemes] = useState();
     const [giftThemes, setGiftThemes] = useState();
 
+    const [roomName, setRoomName] = useState();
+    const [roomPass, setRoomPass] = useState();
+    const [codeNamesThemeSelected, setCodeNamesThemeSelected] = useState('');
+    const [giftThemesSelected, setGiftThemesSelected] = useState([]);
+    const [budget, setBudget] = useState();
+    const [genderReviel, setGenderReviel] = useState();
+
+    const onRoomNameChange = (e) => setRoomName(e.target.value);
+    const onRoomPassChange = (e) => setRoomPass(e.target.value);
+    const onCodeNamesThemeSelectedChange = (e) => {
+        setCodeNamesThemeSelected(e.target.value);
+    };
+    const onGiftThemesSelectedChange = (e) => {
+        const { target: { value } } = e;
+        setGiftThemesSelected(typeof value === 'string' ? value.split(',') : value);
+    };
+    const onBudgetChange = (e) => setBudget(e.target.value);
+    const onGenderRevielChange = (e) => setGenderReviel(e.target.value);
+
+    const handleCreateRoom = () => {
+        const newRoomData = {
+            roomName: roomName,
+            roomPassCode: roomPass,
+            codeNamesTheme: codeNamesThemeSelected,
+            giftTheme: giftThemesSelected,
+            budget: budget,
+            genderReviel: genderReviel
+        }
+        //todo send to BE
+    }
+
     useEffect(() => {
         setCodeNamesThemes(mockedCodeNameThemes);
         setGiftThemes(mockedGiftThemes);
-
     }, []);
 
     return (
@@ -70,20 +102,49 @@ const CreateRoomModal = ({ open, onClose }) => {
                     spacing={2}
                     >
                         {/* <FormGroup> */}
-                        <TextField id="standard-basic" label="Room Name" variant="standard" />
-                        <TextField id="standard-basic" label="Pass Code" variant="standard" />
+                        <TextField 
+                            id="standard-basic" 
+                            label="Room Name" 
+                            variant="standard" 
+                            onChange={onRoomNameChange}
+                        />
+                        <TextField 
+                            id="standard-basic"
+                            label="Pass Code" 
+                            variant="standard" 
+                            onChange={onRoomPassChange}
+                        />
 
-                        <FancySelect label="Code Names Theme"
+                        <FancySelect 
+                            label="Code Names Theme"
                             source={codeNamesThemes}
+                            handleChange={onCodeNamesThemeSelectedChange}
+                            value={codeNamesThemeSelected}
                         />
-                        <MultipleSelect label="Code Gift Theme"
+                        <MultipleSelect 
+                            label="Code Gift Theme"
                             source={giftThemes}
+                            handleChange={onGiftThemesSelectedChange}
+                            value={giftThemesSelected}
                         />
 
-                        <TextField id="standard-basic" label="Budget" variant="standard" />
-                        <FormControlLabel control={<Checkbox defaultChecked />} label="I want to know the gender" />
+                        <TextField 
+                            id="standard-basic" 
+                            label="Budget" 
+                            variant="standard" 
+                            onChange={onBudgetChange}
+                        />
+                        <FormControlLabel 
+                            control={<Checkbox defaultChecked />} 
+                            label="I want to know the gender" 
+                            onChange={onGenderRevielChange}
+                        />
 
-                        <Button variant="outlined">create room</Button>
+                        <Button 
+                            variant="outlined"
+                            onClick={handleCreateRoom}>
+                                create room
+                            </Button>
                         {/* </FormGroup> */}
                 </Stack>
             </Box>

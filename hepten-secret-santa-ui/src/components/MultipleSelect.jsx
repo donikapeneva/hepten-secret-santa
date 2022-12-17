@@ -17,18 +17,18 @@ const MenuProps = {
   },
 };
 
-const MultipleSelect = ({ label, source })  => {
-  const [personName, setPersonName] = useState([]);
+const MultipleSelect = ({ label, source, value, handleChange })  => {
+//   const [personName, setPersonName] = useState([]);
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
+//   const handleChange = (event) => {
+//     const {
+//       target: { value },
+//     } = event;
+//     setPersonName(
+//       // On autofill we get a stringified value.
+//       typeof value === 'string' ? value.split(',') : value,
+//     );
+//   };
 
   return (
     <div>
@@ -39,7 +39,7 @@ const MultipleSelect = ({ label, source })  => {
             labelId="multiple-checkbox-label"
             id="multiple-checkbox"
             multiple
-            value={personName}
+            value={value}
             onChange={handleChange}
             // input={<OutlinedInput label="Tag" />}
             renderValue={(selected) => selected.join(', ')}
@@ -47,7 +47,7 @@ const MultipleSelect = ({ label, source })  => {
         >
           {source.map((name) => (
             <MenuItem key={name} value={name}>
-              <Checkbox checked={personName.indexOf(name) > -1} />
+              <Checkbox checked={value.indexOf(name) > -1} />
               <ListItemText primary={name} />
             </MenuItem>
           ))}

@@ -4,12 +4,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-const FancySelect = ({ label, source }) => {
-  const [age, setAge] = useState('');
+const FancySelect = ({ label, source, value, handleChange }) => {
+//   const [value, setValue] = useState('');
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
+//   const handleChange = (event) => {
+//     setValue(event.target.value);
+
+//   };
 
   return (
     <div>
@@ -18,7 +19,7 @@ const FancySelect = ({ label, source }) => {
         <Select
           labelId="demo-simple-select-standard-label"
           id="select-standard"
-          value={age}
+          value={value}
           onChange={handleChange}
           label={label}
         >
@@ -34,6 +35,7 @@ const FancySelect = ({ label, source }) => {
         
         </Select>
       </FormControl>
+      
     </div>
   );
 }
