@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 
+import { useNavigate } from "react-router-dom";
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -21,6 +23,7 @@ const style = {
 
 
 const EnterRoomModal = ({ open, onClose }) => {
+    const navigate = useNavigate();
 
     const [roomName, setRoomName] = useState();
     const [roomPass, setRoomPass] = useState();
@@ -72,12 +75,15 @@ const EnterRoomModal = ({ open, onClose }) => {
 
     const handleEnterRoom = () => {
         validateForm();
+
         const enterRoomData = {
             roomName: roomName,
             roomPassCode: roomPass,
             username: username
         }
         //todo send to BE
+
+        navigate('room', { replace: false });
     }
 
     return (
@@ -126,12 +132,14 @@ const EnterRoomModal = ({ open, onClose }) => {
                             onChange={onUsernameChange}
                             error={validationErrors?.usernameError}
                         />
-
+                        
                         <Button 
                             variant="outlined"
                             onClick={handleEnterRoom}>
+                               
                                 enter room
-                            </Button>
+                        </Button>
+                            
                         {/* </FormGroup> */}
                 </Stack>
             </Box>
