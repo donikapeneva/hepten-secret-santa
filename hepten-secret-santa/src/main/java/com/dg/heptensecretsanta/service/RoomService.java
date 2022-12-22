@@ -62,6 +62,7 @@ public class RoomService {
         room.setBudget(roomDto.budget());
         room.setNicknameThemeId(nicknameTheme.getId());
         room.setStatus("INITIALIZED");
+        
         return room;
     }
 }
