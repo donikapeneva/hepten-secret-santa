@@ -14,12 +14,12 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function7;
+import org.jooq.Function8;
 import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -86,6 +86,11 @@ public class Room extends TableImpl<RoomRecord> {
      * The column <code>public.room.status</code>.
      */
     public final TableField<RoomRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(256).nullable(false), this, "");
+
+    /**
+     * The column <code>public.room.reveal</code>.
+     */
+    public final TableField<RoomRecord, Boolean> REVEAL = createField(DSL.name("reveal"), SQLDataType.BOOLEAN, this, "");
 
     private Room(Name alias, Table<RoomRecord> aliased) {
         this(alias, aliased, null);
@@ -204,18 +209,18 @@ public class Room extends TableImpl<RoomRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Integer, String, String, Integer, String, Integer, String> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<Integer, String, String, Integer, String, Integer, String, Boolean> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function7<? super Integer, ? super String, ? super String, ? super Integer, ? super String, ? super Integer, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function8<? super Integer, ? super String, ? super String, ? super Integer, ? super String, ? super Integer, ? super String, ? super Boolean, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -223,7 +228,7 @@ public class Room extends TableImpl<RoomRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function7<? super Integer, ? super String, ? super String, ? super Integer, ? super String, ? super Integer, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function8<? super Integer, ? super String, ? super String, ? super Integer, ? super String, ? super Integer, ? super String, ? super Boolean, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

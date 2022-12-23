@@ -1,14 +1,12 @@
 package com.dg.heptensecretsanta.web.controller;
 
-import com.dg.heptensecretsanta.dto.RoomDto;
+import com.dg.heptensecretsanta.dto.CreateRoomDto;
+import com.dg.heptensecretsanta.dto.UserDto;
 import com.dg.heptensecretsanta.service.RoomService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @AllArgsConstructor
@@ -20,9 +18,13 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping
-    public String createRoom(@RequestBody RoomDto roomDto) {
-
-
-        return "OK";
+    public Integer createRoom(@RequestBody CreateRoomDto roomDto) {
+        return roomService.createRoom(roomDto);
     }
+
+    @PostMapping("/{roomPassCode}/users")
+    public Integer registerUserToRoom(@PathVariable String roomPassCode, @RequestBody UserDto userDto) {
+        return roomService.registerUserToRoom(roomPassCode, userDto);
+    }
+
 }

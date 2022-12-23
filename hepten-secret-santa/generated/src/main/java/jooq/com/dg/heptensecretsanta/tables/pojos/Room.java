@@ -22,6 +22,7 @@ public class Room implements Serializable {
     private String budget;
     private Integer nicknameThemeId;
     private String status;
+    private Boolean reveal;
 
     public Room() {}
 
@@ -33,6 +34,7 @@ public class Room implements Serializable {
         this.budget = value.budget;
         this.nicknameThemeId = value.nicknameThemeId;
         this.status = value.status;
+        this.reveal = value.reveal;
     }
 
     public Room(
@@ -42,7 +44,8 @@ public class Room implements Serializable {
         Integer userId,
         String budget,
         Integer nicknameThemeId,
-        String status
+        String status,
+        Boolean reveal
     ) {
         this.id = id;
         this.roomName = roomName;
@@ -51,6 +54,7 @@ public class Room implements Serializable {
         this.budget = budget;
         this.nicknameThemeId = nicknameThemeId;
         this.status = status;
+        this.reveal = reveal;
     }
 
     /**
@@ -151,6 +155,20 @@ public class Room implements Serializable {
         this.status = status;
     }
 
+    /**
+     * Getter for <code>public.room.reveal</code>.
+     */
+    public Boolean getReveal() {
+        return this.reveal;
+    }
+
+    /**
+     * Setter for <code>public.room.reveal</code>.
+     */
+    public void setReveal(Boolean reveal) {
+        this.reveal = reveal;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -202,6 +220,12 @@ public class Room implements Serializable {
         }
         else if (!this.status.equals(other.status))
             return false;
+        if (this.reveal == null) {
+            if (other.reveal != null)
+                return false;
+        }
+        else if (!this.reveal.equals(other.reveal))
+            return false;
         return true;
     }
 
@@ -216,6 +240,7 @@ public class Room implements Serializable {
         result = prime * result + ((this.budget == null) ? 0 : this.budget.hashCode());
         result = prime * result + ((this.nicknameThemeId == null) ? 0 : this.nicknameThemeId.hashCode());
         result = prime * result + ((this.status == null) ? 0 : this.status.hashCode());
+        result = prime * result + ((this.reveal == null) ? 0 : this.reveal.hashCode());
         return result;
     }
 
@@ -230,6 +255,7 @@ public class Room implements Serializable {
         sb.append(", ").append(budget);
         sb.append(", ").append(nicknameThemeId);
         sb.append(", ").append(status);
+        sb.append(", ").append(reveal);
 
         sb.append(")");
         return sb.toString();

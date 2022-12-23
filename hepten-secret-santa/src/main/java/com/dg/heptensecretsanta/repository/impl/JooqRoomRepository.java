@@ -2,11 +2,15 @@ package com.dg.heptensecretsanta.repository.impl;
 
 import com.dg.heptensecretsanta.repository.RoomRepository;
 import com.dg.heptensecretsanta.tables.pojos.Room;
+import com.dg.heptensecretsanta.tables.pojos.User;
 import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import static com.dg.heptensecretsanta.Tables.ROOM;
+import static com.dg.heptensecretsanta.Tables.ROOM_USER_MAPPING;
 
 @Repository
 @AllArgsConstructor
@@ -25,5 +29,21 @@ public class JooqRoomRepository implements RoomRepository {
                 .set(ROOM.STATUS, room.getStatus())
                 .returningResult(ROOM)
                 .fetchOneInto(Room.class);
+    }
+
+    @Override
+    public void createRoomUserMapping(Room room, User user) {
+        create.insertInto(ROOM_USER_MAPPING)
+                .set(ROOM_USER_MAPPING.ROOM_ID, room.getId())
+                .set(ROOM_USER_MAPPING.USER_ID, user.getId())
+                .execute();
+    }
+
+    @Override
+    public Optional<Room> fetchRoomByPassCode(String passCode) {
+        return create.selectFrom(ROOM)
+                .where(ROOM.PASS_CODE.eq(passCode))
+                .fetchOptionalInto(Room.class);
+
     }
 }
