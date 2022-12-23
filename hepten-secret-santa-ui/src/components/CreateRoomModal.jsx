@@ -10,6 +10,7 @@ import MultipleSelect from './MultipleSelect';
 import FancySelect from './FancySelect';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { createRoom } from '../dataSource/room_resource';
 
 const mockedCodeNameThemes = [
     'Famous People',
@@ -119,6 +120,8 @@ const CreateRoomModal = ({ open, onClose }) => {
             genderReviel: genderReviel
         }
         //todo send to BE
+        createRoom(newRoomData)
+            .then(res => console.log('>>>> ',res));
     }
 
     useEffect(() => {

@@ -1,0 +1,1 @@
+export const MS_BACKEND_URL = 'http://localhost:9999/secret-santa';
