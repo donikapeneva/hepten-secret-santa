@@ -2,6 +2,7 @@ package com.dg.heptensecretsanta.repository.impl;
 
 import com.dg.heptensecretsanta.Tables;
 import com.dg.heptensecretsanta.repository.UserRepository;
+import com.dg.heptensecretsanta.tables.pojos.NicknameUserMapping;
 import com.dg.heptensecretsanta.tables.pojos.User;
 import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
@@ -35,4 +36,14 @@ public class JooqUserRepository implements UserRepository {
                 .returningResult(Tables.USER)
                 .fetchOneInto(User.class);
     }
+
+    @Override
+    public NicknameUserMapping createNicknameByUser(Integer userId, Integer roomId, String nickname) {
+        return create.insertInto(Tables.NICKNAME_USER_MAPPING)
+                .values(userId, roomId, nickname)
+                .returningResult(Tables.NICKNAME_USER_MAPPING)
+                .fetchOneInto(NicknameUserMapping.class);
+    }
+
+
 }

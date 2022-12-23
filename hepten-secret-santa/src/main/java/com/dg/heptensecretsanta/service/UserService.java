@@ -1,6 +1,7 @@
 package com.dg.heptensecretsanta.service;
 
 import com.dg.heptensecretsanta.repository.UserRepository;
+import com.dg.heptensecretsanta.tables.pojos.NicknameUserMapping;
 import com.dg.heptensecretsanta.tables.pojos.User;
 import com.dg.heptensecretsanta.web.validation.exception.ApiBadRequestException;
 import lombok.AllArgsConstructor;
@@ -31,5 +32,13 @@ public class UserService {
         }
 
         return userRepository.fetchUserByUsername(username);
+    }
+
+    public NicknameUserMapping createNicknameByUser(Integer userId, Integer roomId, String nickname) {
+//        if (user == null || StringUtils.isBlank(user.getUsername())) {
+//            throw new ApiBadRequestException("Missing data to create a user");
+//        }
+
+        return userRepository.createNicknameByUser(userId, roomId, nickname);
     }
 }

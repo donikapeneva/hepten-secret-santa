@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequestMapping("/secret-santa/rooms")
+@CrossOrigin
 public class RoomController {
 
     private final RoomService roomService;
@@ -26,5 +27,12 @@ public class RoomController {
     public Integer registerUserToRoom(@PathVariable String roomPassCode, @RequestBody UserDto userDto) {
         return roomService.registerUserToRoom(roomPassCode, userDto);
     }
+
+    @PutMapping("/{id}/map-people")
+    public Integer mapPeople(@PathVariable Integer id) {
+        return roomService.mapPeople(id);
+    }
+
+
 
 }

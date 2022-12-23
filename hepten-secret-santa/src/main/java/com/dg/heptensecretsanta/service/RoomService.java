@@ -2,6 +2,7 @@ package com.dg.heptensecretsanta.service;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
 import com.dg.heptensecretsanta.dto.UserDto;
+import com.dg.heptensecretsanta.pojo.UserWithNickname;
 import com.dg.heptensecretsanta.repository.RoomRepository;
 import com.dg.heptensecretsanta.tables.pojos.GiftTheme;
 import com.dg.heptensecretsanta.tables.pojos.NicknameTheme;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +49,7 @@ public class RoomService {
                 .collect(Collectors.toList());
 
         // find nickname theme
-        NicknameTheme nicknameTheme = nicknameThemeService.getGiftThemeByCategory(roomDto.nicknameThemeCategory());
+        NicknameTheme nicknameTheme = nicknameThemeService.getNicknameThemeByCategory(roomDto.nicknameThemeCategory());
 
         // map the data
 
@@ -93,5 +96,58 @@ public class RoomService {
         createRoomUserMapping(room.get(), user.get());
 
         return user.get().getId();
+    }
+
+    public Integer mapPeople(Integer roomId) {
+
+        Optional<Room> record = roomRepository.fetchRoomById(roomId);
+        Room room = record.get();
+
+        //update room status --> STARTED
+
+        //get participants by room id
+        Optional<List<User>> users = roomRepository.fetchRoomUserByRoomId(roomId);
+
+        // get list of themed nicknames
+        List<String> nicknames = new ArrayList<>(Arrays.asList(
+                nicknameThemeService.getNicknameThemeById(room.getNicknameThemeId())
+                .getNicknames().split(",")
+        ));
+
+        List<User> givers = users.get();
+        List<User> receivers = users.get();
+
+        //  for user in users -> assign nickname
+        givers.stream()
+                .forEach((user) -> {
+                    UserWithNickname participant = new UserWithNickname();
+                    participant.setUsername(user.getUsername());
+                    //random number
+                    int rando = (int)((Math.random()*nicknames.size()));
+                    String randomNick = nicknames.remove(rando);
+                    participant.setNickname(randomNick);
+                    participant.setRoomId(roomId);
+                    userService.createNicknameByUser(user.getId(), roomId, randomNick);
+                });
+
+        givers.stream()
+                .forEach((giver) -> {
+                    //do it smarter pls
+                    int self = receivers.indexOf(giver);
+                    int rando = 0;
+                    while (rando == self && receivers.size() > 1) {
+                        rando = (int)((Math.random() * receivers.size()));
+                    }
+
+                    User receiver = receivers.remove(rando);
+                    System.out.println(">>>>>>>>>>>>>> giver " + giver.getId() + " receiver : " + receiver.getId());
+
+                    roomRepository.updateRoomUserMappingByRoomIdAndUserId(roomId, giver.getId(), receiver.getId());
+
+                    //select theme
+        });
+
+
+        return roomId;
     }
 }

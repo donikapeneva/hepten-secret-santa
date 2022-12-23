@@ -26,4 +26,12 @@ public class JooqNicknameThemeRepository implements NicknameThemeRepository {
                 .where(Tables.NICKNAME_THEME.CATEGORY.eq(category))
                 .fetchOptionalInto(NicknameTheme.class);
     }
+
+    @Override
+    public Optional<NicknameTheme> fetchNicknameThemeById(Integer id) {
+
+        return create.selectFrom(Tables.NICKNAME_THEME)
+                .where(Tables.NICKNAME_THEME.ID.eq(id))
+                .fetchOptionalInto(NicknameTheme.class);
+    }
 }

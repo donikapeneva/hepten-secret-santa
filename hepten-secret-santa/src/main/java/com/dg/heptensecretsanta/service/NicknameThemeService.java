@@ -14,7 +14,7 @@ public class NicknameThemeService {
 
     private final NicknameThemeRepository nicknameThemeRepository;
 
-    public NicknameTheme getGiftThemeByCategory(String category) {
+    public NicknameTheme getNicknameThemeByCategory(String category) {
         if (StringUtils.isBlank(category)) {
             throw new ApiBadRequestException("Missing category");
         }
@@ -22,4 +22,10 @@ public class NicknameThemeService {
         return nicknameThemeRepository.fetchNicknameThemeByCategory(category)
                 .orElseThrow(() -> new ApiResourceNotFoundException("No existing category"));
     }
+
+    public NicknameTheme getNicknameThemeById(Integer id) {
+        return nicknameThemeRepository.fetchNicknameThemeById(id)
+                .orElseThrow(() -> new ApiResourceNotFoundException("No existing category"));
+    }
+
 }

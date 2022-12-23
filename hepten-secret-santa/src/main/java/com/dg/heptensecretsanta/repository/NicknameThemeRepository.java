@@ -7,5 +7,6 @@ import java.util.Optional;
 public interface NicknameThemeRepository {
 
     Optional<NicknameTheme> fetchNicknameThemeByCategory(String category);
+    Optional<NicknameTheme> fetchNicknameThemeById(Integer id);
 
 }
