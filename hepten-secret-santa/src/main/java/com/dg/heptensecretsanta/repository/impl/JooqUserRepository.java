@@ -1,15 +1,23 @@
 package com.dg.heptensecretsanta.repository.impl;
 
 import com.dg.heptensecretsanta.Tables;
+import com.dg.heptensecretsanta.dto.RoomMappingDTO;
+import com.dg.heptensecretsanta.pojo.Receiver;
+import com.dg.heptensecretsanta.pojo.RoomUserMapping;
 import com.dg.heptensecretsanta.repository.UserRepository;
 import com.dg.heptensecretsanta.tables.pojos.NicknameUserMapping;
 import com.dg.heptensecretsanta.tables.pojos.User;
 import lombok.AllArgsConstructor;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.tools.StringUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+
+import static com.dg.heptensecretsanta.Tables.*;
+import static com.dg.heptensecretsanta.Tables.ROOM_USER_MAPPING;
 
 @Repository
 @AllArgsConstructor

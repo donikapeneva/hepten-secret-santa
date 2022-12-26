@@ -1,6 +1,7 @@
 package com.dg.heptensecretsanta.service;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
+import com.dg.heptensecretsanta.dto.RoomMappingDTO;
 import com.dg.heptensecretsanta.dto.UserDto;
 import com.dg.heptensecretsanta.pojo.UserWithNickname;
 import com.dg.heptensecretsanta.repository.RoomRepository;
@@ -25,6 +26,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class RoomService {
 
+    public static final String STATUS_REVEALED = "REVEALED";
+    public static final String STATUS_INIT = "INITIALIZED";
+    public static final String STATUS_STARTED = "STARTED";
     private final RoomRepository roomRepository;
 
     private final UserService userService;
@@ -71,7 +75,7 @@ public class RoomService {
         room.setUserId(user.getId());
         room.setBudget(roomDto.budget());
         room.setNicknameThemeId(nicknameTheme.getId());
-        room.setStatus("INITIALIZED");
+        room.setStatus(STATUS_INIT);
         room.setReveal(false);
 
         return room;
@@ -98,12 +102,12 @@ public class RoomService {
         return user.get().getId();
     }
 
-    public Integer mapPeople(Integer roomId) {
+    public RoomMappingDTO mapPeople(Integer roomId) {
+
+        roomRepository.updateRoomStatus(roomId, STATUS_STARTED);
 
         Optional<Room> record = roomRepository.fetchRoomById(roomId);
         Room room = record.get();
-
-        //update room status --> STARTED
 
         //get participants by room id
         Optional<List<User>> users = roomRepository.fetchRoomUserByRoomId(roomId);
@@ -114,7 +118,7 @@ public class RoomService {
                 .getNicknames().split(",")
         ));
 
-        List<User> givers = users.get();
+        List<User> givers = users.get().stream().toList();
         List<User> receivers = users.get();
 
         //  for user in users -> assign nickname
@@ -135,6 +139,7 @@ public class RoomService {
                     //do it smarter pls
                     int self = receivers.indexOf(giver);
                     int rando = 0;
+
                     while (rando == self && receivers.size() > 1) {
                         rando = (int)((Math.random() * receivers.size()));
                     }
@@ -147,7 +152,32 @@ public class RoomService {
                     //select theme
         });
 
-
-        return roomId;
+        return roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
     }
+
+    public RoomMappingDTO reveal(Integer roomId) {
+        roomRepository.updateRoomStatus(roomId, STATUS_REVEALED);
+        return roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
+    }
+
+
+    public RoomMappingDTO getMapping(Integer roomId) {
+        Optional<Room> room = roomRepository.fetchRoomById(roomId);
+
+        RoomMappingDTO mapping = roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
+        if(!STATUS_REVEALED.equals(room.get().getStatus())) {
+            RoomMappingDTO hidden = new RoomMappingDTO();
+            hidden.setMapping(mapping.getMapping().stream()
+                    .map((pair) -> {
+                        pair.setReceiver(null);
+                        return pair;
+                    })
+                    .toList());
+            return hidden;
+        }
+
+        return mapping;
+    }
+
+
 }

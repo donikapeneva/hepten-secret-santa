@@ -1,6 +1,7 @@
 package com.dg.heptensecretsanta.web.controller;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
+import com.dg.heptensecretsanta.dto.RoomMappingDTO;
 import com.dg.heptensecretsanta.dto.UserDto;
 import com.dg.heptensecretsanta.service.RoomService;
 import lombok.AllArgsConstructor;
@@ -29,8 +30,18 @@ public class RoomController {
     }
 
     @PutMapping("/{id}/map-people")
-    public Integer mapPeople(@PathVariable Integer id) {
+    public RoomMappingDTO mapPeople(@PathVariable Integer id) {
         return roomService.mapPeople(id);
+    }
+
+    @PutMapping("/{id}/reveal")
+    public RoomMappingDTO reveal(@PathVariable Integer id) {
+        return roomService.reveal(id);
+    }
+
+    @GetMapping("/{id}/info")
+    public RoomMappingDTO getMapping(@PathVariable Integer id) {
+        return roomService.getMapping(id);
     }
 
 
