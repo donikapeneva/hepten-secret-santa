@@ -11,31 +11,33 @@ import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import { useEffect } from 'react';
+import { getRoom, revealRoom } from '../../dataSource/room_resource';
 
-const getMockedRoomInfo = () => {
-    return {
-        budget: 10,
-        giftsExchangeList: [
-            {
-                giver: 'Test1',
-                receiver: 'Fake Name 5',
-                giftTheme: 'asd'
-            },
-            {
-                giver: 'Test2',
-                receiver: 'Fake Name 5',
-                giftTheme: 'asd'
-            },
-            {
-                giver: 'Test3',
-                receiver: 'Fake Name 5',
-                giftTheme: 'asd'
-            },
-        ]
-    }
-}
+// const getMockedRoomInfo = () => {
+//     return {
+//         budget: 10,
+//         giftsExchangeList: [
+//             {
+//                 giver: 'Test1',
+//                 receiver: 'Fake Name 5',
+//                 giftTheme: 'asd'
+//             },
+//             {
+//                 giver: 'Test2',
+//                 receiver: 'Fake Name 5',
+//                 giftTheme: 'asd'
+//             },
+//             {
+//                 giver: 'Test3',
+//                 receiver: 'Fake Name 5',
+//                 giftTheme: 'asd'
+//             },
+//         ]
+//     }
+// }
 
-const getRevialedData = () => {
+const getRevealedData = () => {
+
     //make call to BE
     return {
         budget: 10,
@@ -67,15 +69,26 @@ const Room = () => {
 
     const [roomInfo, setRoomInfo] = useState({});
 
-    const handleRevial = () => {
+    const handleReveal = () => {
         console.log('>>>> change');
-        setRoomInfo(getRevialedData());
+        revealRoom(1);
+        getRoom(1)
+            .then(data => {
+                console.log('>> room ingo', data);
+                setRoomInfo(data)});
+        // setRoomInfo(getRevealedData());
     }
 
 
     useEffect(() => {
-        setRoomInfo(getMockedRoomInfo());
+        const data = getRoom(1)
+            .then(data => {
+                console.log('>> room ingo', data);
+                setRoomInfo(data)});
+        console.log('>>> data', data);
+        // setRoomInfo(data);
 
+        
     }, []);
 
     return (
@@ -108,9 +121,9 @@ const Room = () => {
                                             {exchange.giver}
                                         </TableCell>
                                         <TableCell align="right">
-                                            {exchange.receiver + (exchange.receiverRealName ? `(${exchange.receiverRealName})` : '' )}
+                                            {exchange.receiverNickname + (exchange.receiver ? `(${exchange.receiver})` : '' )}
                                         </TableCell>
-                                        <TableCell align="right">{exchange.giftTheme}</TableCell>
+                                        <TableCell align="right">{exchange.giftThemes.join(', ')}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -120,8 +133,8 @@ const Room = () => {
                 </div>
 
                 <div className="container">
-                    <Button variant="contained" onClick={handleRevial}>
-                        Revial
+                    <Button variant="contained" onClick={handleReveal}>
+                        Reveal
                     </Button>
                 </div>
 
