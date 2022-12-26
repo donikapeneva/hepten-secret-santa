@@ -1,13 +1,17 @@
 package com.dg.heptensecretsanta.service;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
+import com.dg.heptensecretsanta.dto.EnterRoomDto;
 import com.dg.heptensecretsanta.dto.RoomDTO;
 import com.dg.heptensecretsanta.dto.UserDto;
+import com.dg.heptensecretsanta.pojo.RoomUserMapping;
 import com.dg.heptensecretsanta.pojo.UserWithNickname;
 import com.dg.heptensecretsanta.repository.RoomRepository;
 import com.dg.heptensecretsanta.tables.pojos.*;
 import com.dg.heptensecretsanta.vo.EmailTemplate;
+import com.dg.heptensecretsanta.web.validation.exception.ApiBadRequestException;
 import com.dg.heptensecretsanta.web.validation.exception.ApiResourceNotFoundException;
+import com.dg.heptensecretsanta.web.validation.exception.ApiValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -44,9 +48,14 @@ public class RoomService {
                         "female"))); // TODO: pass it with the auth or custom from the dto
         }
 
+        Room existingRoom = roomRepository.fetchRoomByName(roomDto.roomName());
+        if(existingRoom != null) {
+            throw new ApiBadRequestException("Room exists");
+        }
+
         // find gift theme
         List<GiftTheme> giftThemes = roomDto.giftThemeDtoList().stream()
-                .map(el -> giftThemeService.getGiftThemeByCategory(el.category()))
+                .map(category -> giftThemeService.getGiftThemeByCategory(category))
                 .collect(Collectors.toList());
 
         // find nickname theme
@@ -57,12 +66,19 @@ public class RoomService {
 
         Room room = roomRepository.createRoom(mapData(roomDto, user.get(), nicknameTheme));
         createRoomUserMapping(room, user.get());
+        giftThemes.forEach(giftTheme -> {
+            createRoomGiftMapping(room.getId(), giftTheme.getId());
+        });
 
         return room.getId();
     }
 
     private void createRoomUserMapping(Room room, User user) {
         roomRepository.createRoomUserMapping(room, user);
+    }
+
+    private void createRoomGiftMapping(Integer roomId, Integer categoryId) {
+        roomRepository.createRoomGiftThemeMapping(roomId, categoryId);
     }
 
     private Room mapData(CreateRoomDto roomDto, User user, NicknameTheme nicknameTheme) {
@@ -78,25 +94,35 @@ public class RoomService {
         return room;
     }
 
-    public Integer registerUserToRoom(String passCode, UserDto userDto) {
+    public Integer registerUserToRoom(String roomName, EnterRoomDto enterRoomDto) {
+
         // find room
-        Optional<Room> room = roomRepository.fetchRoomByPassCode(passCode);
-        if (!room.isPresent()) {
-            throw new ApiResourceNotFoundException("Missing room for passCode " + passCode);
+        Room room = roomRepository.fetchRoomByName(roomName);
+        if (room == null) {
+            throw new ApiResourceNotFoundException("Missing room  " + roomName);
+        }
+
+        if (!room.getPassCode().equals(enterRoomDto.passCode())) {
+            throw new ApiResourceNotFoundException("Wrong room pass for " + roomName);
         }
 
         // find user, or create one
-        Optional<User> user = userService.getUserByUsername(userDto.username());
+        Optional<User> user = userService.getUserByUsername(enterRoomDto.username());
         if (!user.isPresent()) {
             user = Optional.of(
-                    userService.createUser(new User(null, userDto.email(),
-                            userDto.username(), LocalDateTime.now(ZoneOffset.UTC),
-                            userDto.gender())));
+                    userService.createUser(new User(null, enterRoomDto.email(),
+                            enterRoomDto.username(), LocalDateTime.now(ZoneOffset.UTC),
+                            enterRoomDto.gender())));
+        } else {
+            Optional<RoomUserMapping> registeredUser = roomRepository.fetchRoomUserMappingByRoomIdAndUserId(room.getId(), user.get().getId());
+            if(registeredUser.isPresent()){
+                return room.getId();
+            }
         }
 
-        createRoomUserMapping(room.get(), user.get());
+        createRoomUserMapping(room, user.get());
 
-        return user.get().getId();
+        return room.getId();
     }
 
     public RoomDTO mapPeople(Integer roomId) {
@@ -195,18 +221,43 @@ public class RoomService {
     public RoomDTO getMapping(Integer roomId) {
         Optional<Room> room = roomRepository.fetchRoomById(roomId);
 
-        RoomDTO roomDto = this.getAllInfoRoomUserMappingByRoomId(roomId);
-        if(!STATUS_REVEALED.equals(room.get().getStatus())) {
+        switch(room.get().getStatus()) {
+            case (STATUS_REVEALED):
+                return this.getAllInfoRoomUserMappingByRoomId(roomId);
+            case (STATUS_STARTED):
 
-            roomDto.setMapping(roomDto.getMapping().stream()
-                    .map(pair -> {
-                        pair.setReceiver(null);
-                        return pair;
-                    })
-                    .toList());
+                RoomDTO roomDto = this.getAllInfoRoomUserMappingByRoomId(roomId);
+                roomDto.setMapping(roomDto.getMapping().stream()
+                        .map(pair -> {
+                            pair.setReceiver(null);
+                            return pair;
+                        })
+                        .toList());
+                return roomDto;
+            case (STATUS_INIT):
+            default:
+                return this.getUsersInRoom(roomId);
         }
 
-        return roomDto;
+    }
+
+    private RoomDTO getUsersInRoom(Integer roomId) {
+        Optional<List<User>> usersInRoom = roomRepository.fetchRoomUserByRoomId(roomId);
+        RoomDTO roomInfo = new RoomDTO();
+
+        if(!usersInRoom.isPresent()) {
+            return roomInfo;
+        }
+
+        List<RoomUserMapping> givers = usersInRoom.get().stream()
+                .map((user) -> {
+                    RoomUserMapping mapping = new RoomUserMapping();
+                    mapping.setGiver(user.getUsername());
+                    return mapping;
+                })
+                .toList();
+        roomInfo.setMapping(givers);
+        return roomInfo;
     }
 
 

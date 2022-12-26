@@ -12,6 +12,7 @@ public interface GiftThemeRepository {
     Optional<List<GiftTheme>> fetchGiftThemeByRoomId(Integer roomId);
     Optional<List<GiftThemeUserMapping>> fetchGiftThemeByRoomAndUserMapping(Integer roomId, Integer userId);
     void insertGiftThemeUserMapping(Integer userId, Integer roomId, Integer categoryId, String giftAttribute);
+    Optional<List<GiftTheme>> fetchAllGiftTheme();
 
 
 }

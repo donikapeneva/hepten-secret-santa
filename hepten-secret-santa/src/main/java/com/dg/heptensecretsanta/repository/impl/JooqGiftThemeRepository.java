@@ -44,6 +44,15 @@ public class JooqGiftThemeRepository implements GiftThemeRepository {
         return Optional.ofNullable(records);
     }
 
+
+    @Override
+    public Optional<List<GiftTheme>> fetchAllGiftTheme() {
+        List<GiftTheme> records = create.selectFrom(Tables.GIFT_THEME)
+                .fetchInto(GiftTheme.class);
+
+        return Optional.ofNullable(records);
+    }
+
     @Override
     public Optional<List<GiftThemeUserMapping>> fetchGiftThemeByRoomAndUserMapping(Integer roomId, Integer userId) {
         List<GiftThemeUserMapping> records = create.selectFrom(Tables.GIFT_THEME_USER_MAPPING)

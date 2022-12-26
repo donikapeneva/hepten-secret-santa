@@ -1,5 +1,6 @@
 package com.dg.heptensecretsanta.service;
 
+import com.dg.heptensecretsanta.dto.NicknameThemeDto;
 import com.dg.heptensecretsanta.repository.NicknameThemeRepository;
 import com.dg.heptensecretsanta.tables.pojos.NicknameTheme;
 import com.dg.heptensecretsanta.web.validation.exception.ApiBadRequestException;
@@ -26,6 +27,11 @@ public class NicknameThemeService {
     public NicknameTheme getNicknameThemeById(Integer id) {
         return nicknameThemeRepository.fetchNicknameThemeById(id)
                 .orElseThrow(() -> new ApiResourceNotFoundException("No existing category"));
+    }
+    public NicknameThemeDto getAllNicknameTheme() {
+        return new NicknameThemeDto(nicknameThemeRepository.fetchAllNicknameTheme().get().stream()
+                .map(theme -> theme.getCategory()).toList());
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.dg.heptensecretsanta.service;
 
+import com.dg.heptensecretsanta.dto.GiftThemeDto;
 import com.dg.heptensecretsanta.repository.GiftThemeRepository;
 import com.dg.heptensecretsanta.tables.pojos.GiftTheme;
 import com.dg.heptensecretsanta.tables.pojos.GiftThemeUserMapping;
@@ -44,6 +45,11 @@ public class GiftThemeService {
 
     public List<GiftThemeUserMapping> getGiftThemeByRoomAndUserMapping(Integer roomId, Integer userId) {
         return giftThemeRepository.fetchGiftThemeByRoomAndUserMapping(roomId, userId).get();
+    }
+
+
+    public GiftThemeDto getAllGiftTheme() {
+        return new GiftThemeDto(giftThemeRepository.fetchAllGiftTheme().get().stream().map(theme -> theme.getCategory()).toList());
     }
 
 }

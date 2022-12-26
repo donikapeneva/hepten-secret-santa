@@ -62,8 +62,15 @@ public class JooqRoomRepository implements RoomRepository {
                 .fetchInto(User.class);
 
         return Optional.ofNullable(records);
+    }
 
 
+    @Override
+    public Optional<RoomUserMapping> fetchRoomUserMappingByRoomIdAndUserId(Integer roomId, Integer userId) {
+        return create.selectFrom(ROOM_USER_MAPPING)
+                .where(ROOM_USER_MAPPING.ROOM_ID.eq(roomId))
+                .and(ROOM_USER_MAPPING.USER_ID.eq(userId))
+                .fetchOptionalInto(RoomUserMapping.class);
     }
 
     @Override
@@ -71,6 +78,14 @@ public class JooqRoomRepository implements RoomRepository {
         return create.selectFrom(ROOM)
                 .where(ROOM.PASS_CODE.eq(passCode))
                 .fetchOptionalInto(Room.class);
+
+    }
+
+    @Override
+    public Room fetchRoomByName(String name) {
+        return create.selectFrom(ROOM)
+                .where(ROOM.ROOM_NAME.eq(name))
+                .fetchAnyInto(Room.class);
 
     }
 
@@ -136,6 +151,14 @@ public class JooqRoomRepository implements RoomRepository {
         create.update(ROOM)
                 .set(ROOM.STATUS, status)
                 .where(ROOM.ID.eq(roomId))
+                .execute();
+    }
+
+    @Override
+    public void createRoomGiftThemeMapping(Integer roomId, Integer categoryId) {
+        create.insertInto(GIFT_THEME_ROOM_MAPPING)
+                .set(GIFT_THEME_ROOM_MAPPING.GIFT_THEME_ID, categoryId)
+                .set(GIFT_THEME_ROOM_MAPPING.ROOM_ID, roomId)
                 .execute();
     }
 

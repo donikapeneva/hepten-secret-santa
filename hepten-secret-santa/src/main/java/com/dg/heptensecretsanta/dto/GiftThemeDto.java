@@ -1,4 +1,12 @@
 package com.dg.heptensecretsanta.dto;
 
-public record GiftThemeDto(String category) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+public class GiftThemeDto {
+    List<String> categories;
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Validated
 public record CreateRoomDto(@NotBlank String roomName, @NotBlank String passCode, @NotBlank String budget,
-                            @JsonProperty("giftTheme") @NotEmpty List<GiftThemeDto> giftThemeDtoList,
+                            @JsonProperty("giftTheme") @NotEmpty List<String> giftThemeDtoList,
                             @NotBlank String nicknameThemeCategory,
                             @NotBlank String creatorUsername) {
 }

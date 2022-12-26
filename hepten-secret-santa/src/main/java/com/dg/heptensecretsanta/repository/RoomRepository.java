@@ -1,6 +1,7 @@
 package com.dg.heptensecretsanta.repository;
 
 import com.dg.heptensecretsanta.dto.RoomDTO;
+import com.dg.heptensecretsanta.pojo.RoomUserMapping;
 import com.dg.heptensecretsanta.tables.pojos.Room;
 import com.dg.heptensecretsanta.tables.pojos.User;
 
@@ -17,6 +18,8 @@ public interface RoomRepository {
 
     Optional<List<User>> fetchRoomUserByRoomId(Integer roomId);
 
+    Optional<RoomUserMapping> fetchRoomUserMappingByRoomIdAndUserId(Integer roomId, Integer userId);
+
     Optional<Room> fetchRoomByPassCode(String passCode);
 
     Optional<Room> fetchRoomById(Integer id);
@@ -24,5 +27,9 @@ public interface RoomRepository {
     RoomDTO getAllInfoRoomUserMappingByRoomId(Integer roomId);
 
     void updateRoomStatus(Integer roomId, String newStatus);
+
+    void createRoomGiftThemeMapping(Integer roomId, Integer categoryId);
+
+    Room fetchRoomByName(String name);
 
 }

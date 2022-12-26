@@ -1,6 +1,7 @@
 package com.dg.heptensecretsanta.web.controller;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
+import com.dg.heptensecretsanta.dto.EnterRoomDto;
 import com.dg.heptensecretsanta.dto.RoomDTO;
 import com.dg.heptensecretsanta.dto.UserDto;
 import com.dg.heptensecretsanta.service.RoomService;
@@ -24,9 +25,9 @@ public class RoomController {
         return roomService.createRoom(roomDto);
     }
 
-    @PostMapping("/{roomPassCode}/users")
-    public Integer registerUserToRoom(@PathVariable String roomPassCode, @RequestBody UserDto userDto) {
-        return roomService.registerUserToRoom(roomPassCode, userDto);
+    @PostMapping("/{roomName}/users")
+    public Integer enterRoom(@PathVariable String roomName, @RequestBody EnterRoomDto enterRoomDto) {
+        return roomService.registerUserToRoom(roomName, enterRoomDto);
     }
 
     @PutMapping("/{id}/map-people")
