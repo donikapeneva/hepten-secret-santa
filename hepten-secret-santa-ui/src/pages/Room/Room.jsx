@@ -11,68 +11,31 @@ import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import { useEffect } from 'react';
-import { getRoom, revealRoom } from '../../dataSource/room_resource';
+import { getRoom, revealRoom, startRoom } from '../../dataSource/room_resource';
 
-// const getMockedRoomInfo = () => {
-//     return {
-//         budget: 10,
-//         giftsExchangeList: [
-//             {
-//                 giver: 'Test1',
-//                 receiver: 'Fake Name 5',
-//                 giftTheme: 'asd'
-//             },
-//             {
-//                 giver: 'Test2',
-//                 receiver: 'Fake Name 5',
-//                 giftTheme: 'asd'
-//             },
-//             {
-//                 giver: 'Test3',
-//                 receiver: 'Fake Name 5',
-//                 giftTheme: 'asd'
-//             },
-//         ]
-//     }
-// }
-
-const getRevealedData = () => {
-
-    //make call to BE
-    return {
-        budget: 10,
-        giftsExchangeList: [
-            {
-                giver: 'Test1',
-                receiver: 'Fake Name 5',
-                receiverRealName: 'Test2',
-                giftTheme: 'asd'
-            },
-            {
-                giver: 'Test2',
-                receiver: 'Fake Name 5',
-                receiverRealName: 'Test2',
-                giftTheme: 'asd'
-            },
-            {
-                giver: 'Test3',
-                receiver: 'Fake Name 5',
-                receiverRealName: 'Test2',
-                giftTheme: 'asd'
-            },
-        ]
-    }
-}
+import { useLocation } from "react-router-dom";
 
 
 const Room = () => {
 
     const [roomInfo, setRoomInfo] = useState({});
+    const { state } = useLocation();
+    const { roomId } = state;
 
     const handleReveal = () => {
         console.log('>>>> change');
-        revealRoom(1);
-        getRoom(1)
+        revealRoom(roomId);
+        getRoom(roomId)
+            .then(data => {
+                console.log('>> room ingo', data);
+                setRoomInfo(data)});
+        // setRoomInfo(getRevealedData());
+    }
+
+    const handleStart = () => {
+        console.log('>>>> change');
+        startRoom(roomId);
+        getRoom(roomId)
             .then(data => {
                 console.log('>> room ingo', data);
                 setRoomInfo(data)});
@@ -81,14 +44,8 @@ const Room = () => {
 
 
     useEffect(() => {
-        const data = getRoom(1)
-            .then(data => {
-                console.log('>> room ingo', data);
-                setRoomInfo(data)});
-        console.log('>>> data', data);
-        // setRoomInfo(data);
-
-        
+        getRoom(roomId)
+            .then(data => setRoomInfo(data));
     }, []);
 
     return (
@@ -123,7 +80,7 @@ const Room = () => {
                                         <TableCell align="right">
                                             {exchange.receiverNickname + (exchange.receiver ? `(${exchange.receiver})` : '' )}
                                         </TableCell>
-                                        <TableCell align="right">{exchange.giftThemes.join(', ')}</TableCell>
+                                        <TableCell align="right">{exchange.giftThemes ? exchange.giftThemes.join(', ') : ''}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -135,6 +92,9 @@ const Room = () => {
                 <div className="container">
                     <Button variant="contained" onClick={handleReveal}>
                         Reveal
+                    </Button>
+                    <Button variant="contained" onClick={handleStart}>
+                        Start room
                     </Button>
                 </div>
 

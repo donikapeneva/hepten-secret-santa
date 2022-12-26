@@ -6,6 +6,7 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
+import { enterRoom } from '../dataSource/room_resource';
 
 import { useNavigate } from "react-router-dom";
 
@@ -82,8 +83,16 @@ const EnterRoomModal = ({ open, onClose }) => {
             username: username
         }
         //todo send to BE
+        enterRoom(roomName, enterRoomData)
+        .then(res => {
+            console.log('>> res', res);
+            if(res.status === 200) {
+                
+                navigate('room', { replace: false, state: {roomId: res.data} });
+            }
+        })
 
-        navigate('room', { replace: false });
+        // navigate('room', { replace: false, state:  });
     }
 
     return (

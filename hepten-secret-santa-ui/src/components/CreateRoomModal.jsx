@@ -11,17 +11,20 @@ import FancySelect from './FancySelect';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { createRoom } from '../dataSource/room_resource';
+import { getNicknameThemes, getGiftThemes } from '../dataSource/theme_resource';
 
-const mockedCodeNameThemes = [
-    'Famous People',
-    'Friends',
-    'Movies',
-];
+import { useNavigate } from "react-router-dom";
 
-const mockedGiftThemes = [
-    'Colors',
-    'Adjectives',
-];
+// const mockedCodeNameThemes = [
+//     'Famous People',
+//     'Friends',
+//     'Movies',
+// ];
+
+// const mockedGiftThemes = [
+//     'Colors',
+//     'Adjectives',
+// ];
 
 const style = {
   position: 'absolute',
@@ -37,6 +40,7 @@ const style = {
 
 
 const CreateRoomModal = ({ open, onClose }) => {
+    const navigate = useNavigate();
     const [codeNamesThemes, setCodeNamesThemes] = useState();
     const [giftThemes, setGiftThemes] = useState();
 
@@ -120,13 +124,22 @@ const CreateRoomModal = ({ open, onClose }) => {
             genderReviel: genderReviel
         }
         //todo send to BE
+        if(!validationErrors){
         createRoom(newRoomData)
-            .then(res => console.log('>>>> ',res));
+            .then(res => {
+                if(res.status === 200) {
+                    const roomId = res.data;
+                    navigate('room',  { replace: false,  state: { roomId: roomId } });
+                }
+            });
+        }
     }
 
     useEffect(() => {
-        setCodeNamesThemes(mockedCodeNameThemes);
-        setGiftThemes(mockedGiftThemes);
+        getNicknameThemes()
+        .then(data => setCodeNamesThemes(data));
+        getGiftThemes()
+        .then(data => setGiftThemes(data));
     }, []);
 
     return (

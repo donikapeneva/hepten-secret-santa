@@ -11,10 +11,24 @@ export const createRoom = (createRoomPojo ) => {
 
 export const revealRoom = (id ) => httpRequest.put(`/rooms/${id}/reveal`);
 
+export const startRoom = (id ) => httpRequest.put(`/rooms/${id}/map-people`);
+
 const getViewRoomDtoToPojo = (dto) => ({
     budget: dto.budget ?  dto.budget : '',
     giftsExchangeList: dto.mapping
 });
+
+export const enterRoom = (roomName, pojo) => {
+    console.log('>>> ')
+    return httpRequest.post(`/rooms/${roomName}/users`, getEnterRoomDto(pojo));
+};
+
+const getEnterRoomDto = (pojo) => ({
+    username: pojo.username,
+    passCode: pojo.roomPassCode,
+    gender: 'n/a'
+});
+
 
 const getCreateRoomDto = (pojo) => ({
     roomName: pojo.roomName,
