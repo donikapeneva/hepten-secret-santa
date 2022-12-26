@@ -1,14 +1,11 @@
 package com.dg.heptensecretsanta.service;
 
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
-import com.dg.heptensecretsanta.dto.RoomMappingDTO;
+import com.dg.heptensecretsanta.dto.RoomDTO;
 import com.dg.heptensecretsanta.dto.UserDto;
 import com.dg.heptensecretsanta.pojo.UserWithNickname;
 import com.dg.heptensecretsanta.repository.RoomRepository;
-import com.dg.heptensecretsanta.tables.pojos.GiftTheme;
-import com.dg.heptensecretsanta.tables.pojos.NicknameTheme;
-import com.dg.heptensecretsanta.tables.pojos.Room;
-import com.dg.heptensecretsanta.tables.pojos.User;
+import com.dg.heptensecretsanta.tables.pojos.*;
 import com.dg.heptensecretsanta.vo.EmailTemplate;
 import com.dg.heptensecretsanta.web.validation.exception.ApiResourceNotFoundException;
 import lombok.AllArgsConstructor;
@@ -102,7 +99,7 @@ public class RoomService {
         return user.get().getId();
     }
 
-    public RoomMappingDTO mapPeople(Integer roomId) {
+    public RoomDTO mapPeople(Integer roomId) {
 
         roomRepository.updateRoomStatus(roomId, STATUS_STARTED);
 
@@ -148,35 +145,68 @@ public class RoomService {
                     System.out.println(">>>>>>>>>>>>>> giver " + giver.getId() + " receiver : " + receiver.getId());
 
                     roomRepository.updateRoomUserMappingByRoomIdAndUserId(roomId, giver.getId(), receiver.getId());
-
-                    //select theme
         });
+
+        List<GiftTheme> giftThemeCategories = giftThemeService.getGiftThemeByRoomId(roomId);
+        giftThemeCategories.stream()
+                .forEach((category) -> {
+                    ArrayList<String> giftThemes = new ArrayList<>(Arrays.asList(
+                            category.getAttributes().split(",")));
+
+                    givers.stream()
+                            .forEach((giver) -> {
+                                int rando = (int)((Math.random() * giftThemes.size()));
+                                String randomTheme = giftThemes.remove(rando);
+
+                                giftThemeService.createGiftThemeUserMapping(giver.getId(), roomId, category.getId(),randomTheme);
+
+                            });
+
+                });
 
         return roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
     }
 
-    public RoomMappingDTO reveal(Integer roomId) {
+    public RoomDTO reveal(Integer roomId) {
         roomRepository.updateRoomStatus(roomId, STATUS_REVEALED);
         return roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
     }
 
+    public RoomDTO getAllInfoRoomUserMappingByRoomId(Integer roomId) {
+        RoomDTO userMapping = roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
+        Room room = roomRepository.fetchRoomById(roomId).get();
 
-    public RoomMappingDTO getMapping(Integer roomId) {
+
+        RoomDTO allInfoMapping = new RoomDTO();
+        allInfoMapping.setMapping(
+                userMapping.getMapping().stream().map((pair) -> {
+                    List<GiftThemeUserMapping> giftThemes = giftThemeService.getGiftThemeByRoomAndUserMapping(roomId, pair.getGiverId());
+                    pair.setGiftThemes(giftThemes.stream().map(theme -> theme.getGiftAttribute()).toList());
+                    return pair;
+                }).toList()
+        );
+        allInfoMapping.setBudget(room.getBudget());
+        allInfoMapping.setRoomName(room.getRoomName());
+
+        return allInfoMapping;
+    }
+
+
+    public RoomDTO getMapping(Integer roomId) {
         Optional<Room> room = roomRepository.fetchRoomById(roomId);
 
-        RoomMappingDTO mapping = roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
+        RoomDTO roomDto = this.getAllInfoRoomUserMappingByRoomId(roomId);
         if(!STATUS_REVEALED.equals(room.get().getStatus())) {
-            RoomMappingDTO hidden = new RoomMappingDTO();
-            hidden.setMapping(mapping.getMapping().stream()
-                    .map((pair) -> {
+
+            roomDto.setMapping(roomDto.getMapping().stream()
+                    .map(pair -> {
                         pair.setReceiver(null);
                         return pair;
                     })
                     .toList());
-            return hidden;
         }
 
-        return mapping;
+        return roomDto;
     }
 
 

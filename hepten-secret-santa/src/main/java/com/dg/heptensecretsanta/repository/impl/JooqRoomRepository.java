@@ -1,6 +1,6 @@
 package com.dg.heptensecretsanta.repository.impl;
 
-import com.dg.heptensecretsanta.dto.RoomMappingDTO;
+import com.dg.heptensecretsanta.dto.RoomDTO;
 import com.dg.heptensecretsanta.pojo.RoomUserMapping;
 import com.dg.heptensecretsanta.repository.RoomRepository;
 import com.dg.heptensecretsanta.tables.pojos.Room;
@@ -83,7 +83,7 @@ public class JooqRoomRepository implements RoomRepository {
 
 
     @Override
-    public RoomMappingDTO getAllInfoRoomUserMappingByRoomId(Integer roomId) {
+    public RoomDTO getAllInfoRoomUserMappingByRoomId(Integer roomId) {
 
 //        select rum.user_id, giver.username, giver_n.nickname, rum.give_to, receiver.username, receiver_n.nickname
 //        from public.room_user_mapping rum
@@ -106,6 +106,7 @@ public class JooqRoomRepository implements RoomRepository {
 
         List<RoomUserMapping> fetch = create
                 .select(rum.USER_ID,
+                        giver.ID,
                         giver.USERNAME,
                         giver_n.NICKNAME,
                         rum.GIVE_TO,
@@ -125,14 +126,16 @@ public class JooqRoomRepository implements RoomRepository {
                 .where(rum.ROOM_ID.eq(roomId))
                 .fetch(this::createRoomMappingFromRecord);
 
-        return new RoomMappingDTO(fetch);
+        RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setMapping(fetch);
+        return roomDTO;
     }
 
     @Override
     public void updateRoomStatus(Integer roomId, String status) {
         create.update(ROOM)
                 .set(ROOM.STATUS, status)
-                .where(ROOM_USER_MAPPING.ROOM_ID.eq(roomId))
+                .where(ROOM.ID.eq(roomId))
                 .execute();
     }
 
@@ -151,6 +154,7 @@ public class JooqRoomRepository implements RoomRepository {
         roomMappingPojo.setGiver(record.field(giver.USERNAME).getValue(record));
         roomMappingPojo.setReceiverNickname(record.field(receiver_n.NICKNAME).getValue(record));
         roomMappingPojo.setReceiver(record.field(receiver.USERNAME).getValue(record));
+        roomMappingPojo.setGiverId(record.field(giver.ID).getValue(record));
 
         return roomMappingPojo;
     }
