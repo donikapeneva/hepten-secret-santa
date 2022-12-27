@@ -10,15 +10,13 @@ import com.dg.heptensecretsanta.tables.pojos.*;
 import com.dg.heptensecretsanta.vo.EmailTemplate;
 import com.dg.heptensecretsanta.web.validation.exception.ApiBadRequestException;
 import com.dg.heptensecretsanta.web.validation.exception.ApiResourceNotFoundException;
+import com.dg.heptensecretsanta.web.validation.exception.ApiValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,6 +102,10 @@ public class RoomService {
             throw new ApiResourceNotFoundException("Wrong room pass for " + roomName);
         }
 
+        if (room.getStatus() != STATUS_INIT) {
+            throw new ApiResourceNotFoundException("Room  is started " + roomName);
+        }
+
         // find user, or create one
         Optional<User> user = userService.getUserByUsername(enterRoomDto.username());
         if (!user.isPresent()) {
@@ -148,7 +150,7 @@ public class RoomService {
                     UserWithNickname participant = new UserWithNickname();
                     participant.setUsername(user.getUsername());
                     //random number
-                    int rando = (int)((Math.random()*nicknames.size()));
+                    int rando = (int)((Math.random() * nicknames.size()));
                     String randomNick = nicknames.remove(rando);
                     participant.setNickname(randomNick);
                     participant.setRoomId(roomId);
@@ -158,11 +160,16 @@ public class RoomService {
         givers.stream()
                 .forEach((giver) -> {
                     //do it smarter pls
+                    Collections.shuffle(receivers);
                     int self = receivers.indexOf(giver);
                     int rando = 0;
 
                     while (rando == self && receivers.size() > 1) {
                         rando = (int)((Math.random() * receivers.size()));
+                    }
+
+                    if(receivers.size() == 1 && receivers.get(0).getId() == giver.getId() ) {
+                        throw new ApiValidationException("Sorry, algorithm error");
                     }
 
                     User receiver = receivers.remove(rando);
