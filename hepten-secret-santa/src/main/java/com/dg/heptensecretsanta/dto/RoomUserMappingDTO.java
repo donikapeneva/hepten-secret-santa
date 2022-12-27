@@ -1,11 +1,11 @@
-package com.dg.heptensecretsanta.pojo;
+package com.dg.heptensecretsanta.dto;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class RoomUserMapping {
+public class RoomUserMappingDTO {
     String giver;
     Integer giverId;
     String receiverNickname;

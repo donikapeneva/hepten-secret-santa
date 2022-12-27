@@ -1,8 +1,9 @@
 package com.dg.heptensecretsanta.repository.impl;
 
 import com.dg.heptensecretsanta.dto.RoomDTO;
-import com.dg.heptensecretsanta.pojo.RoomUserMapping;
+import com.dg.heptensecretsanta.dto.RoomUserMappingDTO;
 import com.dg.heptensecretsanta.repository.RoomRepository;
+import com.dg.heptensecretsanta.tables.pojos.NicknameUserMapping;
 import com.dg.heptensecretsanta.tables.pojos.Room;
 import com.dg.heptensecretsanta.tables.pojos.User;
 import lombok.AllArgsConstructor;
@@ -66,11 +67,11 @@ public class JooqRoomRepository implements RoomRepository {
 
 
     @Override
-    public Optional<RoomUserMapping> fetchRoomUserMappingByRoomIdAndUserId(Integer roomId, Integer userId) {
+    public Optional<RoomUserMappingDTO> fetchRoomUserMappingByRoomIdAndUserId(Integer roomId, Integer userId) {
         return create.selectFrom(ROOM_USER_MAPPING)
                 .where(ROOM_USER_MAPPING.ROOM_ID.eq(roomId))
                 .and(ROOM_USER_MAPPING.USER_ID.eq(userId))
-                .fetchOptionalInto(RoomUserMapping.class);
+                .fetchOptionalInto(RoomUserMappingDTO.class);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class JooqRoomRepository implements RoomRepository {
         com.dg.heptensecretsanta.tables.NicknameUserMapping receiver_n = NICKNAME_USER_MAPPING.as("receiver_n");
         com.dg.heptensecretsanta.tables.User receiver = USER.as("receiver");
 
-        List<RoomUserMapping> fetch = create
+        List<RoomUserMappingDTO> fetch = create
                 .select(rum.USER_ID,
                         giver.ID,
                         giver.USERNAME,
@@ -146,6 +147,71 @@ public class JooqRoomRepository implements RoomRepository {
         return roomDTO;
     }
 
+
+    @Override
+    public List<NicknameUserMapping> getNicknameMapByRoomId(Integer roomId) {
+        return create.selectFrom(NICKNAME_USER_MAPPING)
+                .where(NICKNAME_USER_MAPPING.ROOM_ID.eq(roomId))
+                .fetchInto(NicknameUserMapping.class);
+    }
+
+    @Override
+    public List<com.dg.heptensecretsanta.tables.pojos.RoomUserMapping> getRoomPairsByRoomId(Integer roomId) {
+        return create.selectFrom(ROOM_USER_MAPPING)
+                .where(ROOM_USER_MAPPING.ROOM_ID.eq(roomId))
+                .fetchInto(com.dg.heptensecretsanta.tables.pojos.RoomUserMapping.class);
+    }
+
+//
+//    @Override
+//    public RoomDTO getRoomUserMappingByRoomId(Integer roomId) {
+//
+////        select rum.user_id, giver.username, giver_n.nickname, rum.give_to, receiver.username, receiver_n.nickname
+////        from public.room_user_mapping rum
+////        join public.nickname_user_mapping receiver_n
+////        on rum.give_to = receiver_n.user_id
+////        join public.user receiver
+////        on rum.give_to = receiver.id
+////        join public.nickname_user_mapping giver_n
+////        on rum.user_id = giver_n.user_id
+////        join public.user giver
+////        on rum.user_id = giver.id
+////        ;
+//
+//        com.dg.heptensecretsanta.tables.RoomUserMapping rum = ROOM_USER_MAPPING.as("rum");
+//        com.dg.heptensecretsanta.tables.NicknameUserMapping giver_n = NICKNAME_USER_MAPPING.as("giver_n");
+//        com.dg.heptensecretsanta.tables.User giver = USER.as("giver");
+//
+//        com.dg.heptensecretsanta.tables.NicknameUserMapping receiver_n = NICKNAME_USER_MAPPING.as("receiver_n");
+//        com.dg.heptensecretsanta.tables.User receiver = USER.as("receiver");
+//
+//        List<RoomUserMapping> fetch = create
+//                .select(rum.USER_ID,
+//                        giver.ID,
+//                        giver.USERNAME,
+//                        giver_n.NICKNAME,
+//                        rum.GIVE_TO,
+//                        receiver.USERNAME,
+//                        receiver_n.NICKNAME
+//                ).from(rum)
+//                .join(receiver_n)
+//                .on(rum.GIVE_TO.eq(receiver_n.USER_ID))
+//                .join(receiver)
+//                .on(rum.GIVE_TO.eq(receiver.ID))
+//
+//                .join(giver_n)
+//                .on(rum.USER_ID.eq(giver_n.USER_ID))
+//                .join(giver)
+//                .on(rum.USER_ID.eq(giver.ID))
+//
+//                .where(rum.ROOM_ID.eq(roomId))
+//                .fetch(this::createRoomMappingFromRecord);
+//
+//        RoomDTO roomDTO = new RoomDTO();
+//        roomDTO.setMapping(fetch);
+//        return roomDTO;
+//    }
+
     @Override
     public void updateRoomStatus(Integer roomId, String status) {
         create.update(ROOM)
@@ -163,7 +229,7 @@ public class JooqRoomRepository implements RoomRepository {
     }
 
 
-    private RoomUserMapping createRoomMappingFromRecord(Record record) {
+    private RoomUserMappingDTO createRoomMappingFromRecord(Record record) {
 
         com.dg.heptensecretsanta.tables.RoomUserMapping rum = ROOM_USER_MAPPING.as("rum");
         com.dg.heptensecretsanta.tables.NicknameUserMapping giver_n = NICKNAME_USER_MAPPING.as("giver_n");
@@ -173,7 +239,7 @@ public class JooqRoomRepository implements RoomRepository {
         com.dg.heptensecretsanta.tables.User receiver = USER.as("receiver");
 
 
-        RoomUserMapping roomMappingPojo = new RoomUserMapping();
+        RoomUserMappingDTO roomMappingPojo = new RoomUserMappingDTO();
         roomMappingPojo.setGiver(record.field(giver.USERNAME).getValue(record));
         roomMappingPojo.setReceiverNickname(record.field(receiver_n.NICKNAME).getValue(record));
         roomMappingPojo.setReceiver(record.field(receiver.USERNAME).getValue(record));

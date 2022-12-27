@@ -3,15 +3,13 @@ package com.dg.heptensecretsanta.service;
 import com.dg.heptensecretsanta.dto.CreateRoomDto;
 import com.dg.heptensecretsanta.dto.EnterRoomDto;
 import com.dg.heptensecretsanta.dto.RoomDTO;
-import com.dg.heptensecretsanta.dto.UserDto;
-import com.dg.heptensecretsanta.pojo.RoomUserMapping;
+import com.dg.heptensecretsanta.dto.RoomUserMappingDTO;
 import com.dg.heptensecretsanta.pojo.UserWithNickname;
 import com.dg.heptensecretsanta.repository.RoomRepository;
 import com.dg.heptensecretsanta.tables.pojos.*;
 import com.dg.heptensecretsanta.vo.EmailTemplate;
 import com.dg.heptensecretsanta.web.validation.exception.ApiBadRequestException;
 import com.dg.heptensecretsanta.web.validation.exception.ApiResourceNotFoundException;
-import com.dg.heptensecretsanta.web.validation.exception.ApiValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -114,7 +112,7 @@ public class RoomService {
                             enterRoomDto.username(), LocalDateTime.now(ZoneOffset.UTC),
                             enterRoomDto.gender())));
         } else {
-            Optional<RoomUserMapping> registeredUser = roomRepository.fetchRoomUserMappingByRoomIdAndUserId(room.getId(), user.get().getId());
+            Optional<RoomUserMappingDTO> registeredUser = roomRepository.fetchRoomUserMappingByRoomIdAndUserId(room.getId(), user.get().getId());
             if(registeredUser.isPresent()){
                 return room.getId();
             }
@@ -199,7 +197,9 @@ public class RoomService {
     }
 
     public RoomDTO getAllInfoRoomUserMappingByRoomId(Integer roomId) {
-        RoomDTO userMapping = roomRepository.getAllInfoRoomUserMappingByRoomId(roomId);
+        RoomDTO userMapping = new RoomDTO();
+        userMapping.setMapping(getRoomMapping(roomId));
+
         Room room = roomRepository.fetchRoomById(roomId).get();
 
 
@@ -241,6 +241,29 @@ public class RoomService {
 
     }
 
+    private List<RoomUserMappingDTO> getRoomMapping(Integer roomId) {
+        List<NicknameUserMapping> userNicknameMapping = roomRepository.getNicknameMapByRoomId(roomId);
+        List<RoomUserMapping> roomUserMapping = roomRepository.getRoomPairsByRoomId(roomId);
+
+        return roomUserMapping.stream().map(mappingInRoom -> {
+            RoomUserMappingDTO roomUserMappingDTO = new RoomUserMappingDTO();
+
+            Optional<User> giver = userService.getUserById(mappingInRoom.getUserId());
+            roomUserMappingDTO.setGiver(giver.get().getUsername());
+            roomUserMappingDTO.setGiverId(giver.get().getId());
+
+            Optional<NicknameUserMapping> receiverNickname = userNicknameMapping.stream().filter((user -> user.getUserId() == mappingInRoom.getGiveTo())).findFirst();
+            Optional<User> receiver = userService.getUserById(mappingInRoom.getGiveTo());
+
+            roomUserMappingDTO.setReceiverNickname(receiverNickname.get().getNickname());
+            roomUserMappingDTO.setReceiver(receiver.get().getUsername());
+
+            return roomUserMappingDTO;
+        }).toList();
+
+
+    }
+
     private RoomDTO getUsersInRoom(Integer roomId) {
         Optional<List<User>> usersInRoom = roomRepository.fetchRoomUserByRoomId(roomId);
         RoomDTO roomInfo = new RoomDTO();
@@ -249,9 +272,9 @@ public class RoomService {
             return roomInfo;
         }
 
-        List<RoomUserMapping> givers = usersInRoom.get().stream()
+        List<RoomUserMappingDTO> givers = usersInRoom.get().stream()
                 .map((user) -> {
-                    RoomUserMapping mapping = new RoomUserMapping();
+                    RoomUserMappingDTO mapping = new RoomUserMappingDTO();
                     mapping.setGiver(user.getUsername());
                     return mapping;
                 })

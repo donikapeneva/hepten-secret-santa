@@ -45,5 +45,12 @@ public class JooqUserRepository implements UserRepository {
                 .fetchOneInto(NicknameUserMapping.class);
     }
 
+    @Override
+    public Optional<User> fetchUserById(Integer id) {
+        return create.selectFrom(Tables.USER)
+                .where(Tables.USER.ID.eq(id))
+                .fetchOptionalInto(User.class);
+    }
+
 
 }

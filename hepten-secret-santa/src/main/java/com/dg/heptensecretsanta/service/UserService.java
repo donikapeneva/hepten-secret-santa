@@ -44,4 +44,10 @@ public class UserService {
         return userRepository.createNicknameByUser(userId, roomId, nickname);
     }
 
+    public Optional<User> getUserById(Integer id) {
+
+
+        return userRepository.fetchUserById(id);
+    }
+
 }

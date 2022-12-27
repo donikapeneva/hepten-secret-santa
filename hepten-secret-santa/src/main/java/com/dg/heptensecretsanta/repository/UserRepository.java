@@ -15,4 +15,6 @@ public interface UserRepository {
 
     NicknameUserMapping createNicknameByUser(Integer userId, Integer roomId, String nickname);
 
+    Optional<User> fetchUserById(Integer id);
+
 }
