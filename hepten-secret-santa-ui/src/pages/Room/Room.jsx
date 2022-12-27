@@ -90,12 +90,17 @@ const Room = () => {
                 </div>
 
                 <div className="container">
-                    <Button variant="contained" onClick={handleReveal}>
-                        Reveal
-                    </Button>
-                    <Button variant="contained" onClick={handleStart}>
-                        Start room
-                    </Button>
+                    {roomInfo && roomInfo.status === 'STARTED' && (
+                        <Button variant="contained" onClick={handleReveal}>
+                            Reveal
+                        </Button>
+                    ) }
+                    {roomInfo && roomInfo.status === 'INITIALIZED' && (
+                        <Button variant="contained" onClick={handleStart}>
+                            Start room
+                        </Button>
+                    ) }
+                    
                 </div>
 
 

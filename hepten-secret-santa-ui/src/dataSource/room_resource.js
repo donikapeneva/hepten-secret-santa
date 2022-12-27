@@ -15,6 +15,7 @@ export const startRoom = (id ) => httpRequest.put(`/rooms/${id}/map-people`);
 
 const getViewRoomDtoToPojo = (dto) => ({
     budget: dto.budget ?  dto.budget : '',
+    status: dto.status,
     giftsExchangeList: dto.mapping
 });
 
