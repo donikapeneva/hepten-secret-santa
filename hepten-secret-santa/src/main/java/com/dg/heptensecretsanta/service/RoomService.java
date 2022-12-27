@@ -140,6 +140,7 @@ public class RoomService {
                 nicknameThemeService.getNicknameThemeById(room.getNicknameThemeId())
                 .getNicknames().split(",")
         ));
+        Collections.shuffle(nicknames);
 
         List<User> givers = users.get().stream().toList();
         List<User> receivers = users.get();
@@ -183,6 +184,8 @@ public class RoomService {
                 .forEach((category) -> {
                     ArrayList<String> giftThemes = new ArrayList<>(Arrays.asList(
                             category.getAttributes().split(",")));
+
+                    Collections.shuffle(giftThemes);
 
                     givers.stream()
                             .forEach((giver) -> {
