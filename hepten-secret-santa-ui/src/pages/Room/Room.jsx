@@ -23,23 +23,15 @@ const Room = () => {
     const { roomId } = state;
 
     const handleReveal = () => {
-        console.log('>>>> change');
-        revealRoom(roomId);
-        getRoom(roomId)
-            .then(data => {
-                console.log('>> room ingo', data);
-                setRoomInfo(data)});
-        // setRoomInfo(getRevealedData());
+        revealRoom(roomId)
+        .then(() => getRoom(roomId))
+        .then(data => setRoomInfo(data));
     }
 
     const handleStart = () => {
-        console.log('>>>> change');
-        startRoom(roomId);
-        getRoom(roomId)
-            .then(data => {
-                console.log('>> room ingo', data);
-                setRoomInfo(data)});
-        // setRoomInfo(getRevealedData());
+        startRoom(roomId)
+        .then(() => getRoom(roomId))
+        .then(data => setRoomInfo(data));
     }
 
 
