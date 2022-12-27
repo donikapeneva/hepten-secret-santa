@@ -13,5 +13,6 @@ import java.util.List;
 public class RoomDTO {
     List<RoomUserMappingDTO> mapping;
     String budget;
+    String status;
     String roomName;
 }

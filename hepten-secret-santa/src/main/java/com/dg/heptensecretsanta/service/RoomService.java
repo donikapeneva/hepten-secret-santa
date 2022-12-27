@@ -102,7 +102,7 @@ public class RoomService {
             throw new ApiResourceNotFoundException("Wrong room pass for " + roomName);
         }
 
-        if (room.getStatus() != STATUS_INIT) {
+        if (!room.getStatus().equals(STATUS_INIT)) {
             throw new ApiResourceNotFoundException("Room  is started " + roomName);
         }
 
@@ -219,6 +219,7 @@ public class RoomService {
                 }).toList()
         );
         allInfoMapping.setBudget(room.getBudget());
+        allInfoMapping.setStatus(room.getStatus());
         allInfoMapping.setRoomName(room.getRoomName());
 
         return allInfoMapping;
@@ -227,7 +228,7 @@ public class RoomService {
 
     public RoomDTO getMapping(Integer roomId) {
         Optional<Room> room = roomRepository.fetchRoomById(roomId);
-
+        //todo room status and budget set here
         switch(room.get().getStatus()) {
             case (STATUS_REVEALED):
                 return this.getAllInfoRoomUserMappingByRoomId(roomId);
@@ -273,7 +274,11 @@ public class RoomService {
 
     private RoomDTO getUsersInRoom(Integer roomId) {
         Optional<List<User>> usersInRoom = roomRepository.fetchRoomUserByRoomId(roomId);
+        Optional<Room> room = roomRepository.fetchRoomById(roomId);
+
         RoomDTO roomInfo = new RoomDTO();
+        roomInfo.setStatus(room.get().getStatus());
+        roomInfo.setBudget(room.get().getBudget());
 
         if(!usersInRoom.isPresent()) {
             return roomInfo;
