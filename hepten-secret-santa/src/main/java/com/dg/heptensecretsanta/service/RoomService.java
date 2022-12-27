@@ -13,6 +13,7 @@ import com.dg.heptensecretsanta.web.validation.exception.ApiResourceNotFoundExce
 import com.dg.heptensecretsanta.web.validation.exception.ApiValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -102,13 +103,14 @@ public class RoomService {
             throw new ApiResourceNotFoundException("Wrong room pass for " + roomName);
         }
 
-        if (!room.getStatus().equals(STATUS_INIT)) {
-            throw new ApiResourceNotFoundException("Room  is started " + roomName);
-        }
-
         // find user, or create one
         Optional<User> user = userService.getUserByUsername(enterRoomDto.username());
         if (!user.isPresent()) {
+
+            if (!room.getStatus().equals(STATUS_INIT)) {
+                throw new ApiResourceNotFoundException("Room  is started " + roomName);
+            }
+
             user = Optional.of(
                     userService.createUser(new User(null, enterRoomDto.email(),
                             enterRoomDto.username(), LocalDateTime.now(ZoneOffset.UTC),
@@ -125,6 +127,7 @@ public class RoomService {
         return room.getId();
     }
 
+    @Transactional
     public RoomDTO mapPeople(Integer roomId) {
 
         roomRepository.updateRoomStatus(roomId, STATUS_STARTED);
